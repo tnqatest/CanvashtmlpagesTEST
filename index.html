@@ -7,9 +7,19 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         ul { list-style: none; padding: 0; }
-        li { margin: 10px 0; }
+        li { margin: 10px 0; cursor: pointer; }
         a { text-decoration: none; color: blue; font-size: 18px; }
-        .folder { font-weight: bold; margin-top: 15px; }
+        .folder { font-weight: bold; display: flex; align-items: center; }
+        .folder::before { 
+            content: '\25B6'; /* Right arrow */
+            display: inline-block; 
+            margin-right: 5px; 
+            transition: transform 0.2s;
+        }
+        .folder.open::before {
+            transform: rotate(90deg); /* Down arrow when open */
+        }
+        .file-list { display: none; padding-left: 20px; }
     </style>
 </head>
 <body>
@@ -30,12 +40,19 @@
                         const folderItem = document.createElement("li");
                         folderItem.textContent = item.name;
                         folderItem.classList.add("folder");
+                        const fileList = document.createElement("ul");
+                        fileList.classList.add("file-list");
+                        folderItem.appendChild(fileList);
                         repoContents.appendChild(folderItem);
+
+                        folderItem.addEventListener("click", () => {
+                            fileList.style.display = fileList.style.display === "none" ? "block" : "none";
+                            folderItem.classList.toggle("open");
+                        });
 
                         fetch(item.url)
                             .then(response => response.json())
                             .then(files => {
-                                const fileList = document.createElement("ul");
                                 files.forEach(file => {
                                     if (file.type === "file") {
                                         const fileItem = document.createElement("li");
@@ -46,7 +63,6 @@
                                         fileList.appendChild(fileItem);
                                     }
                                 });
-                                repoContents.appendChild(fileList);
                             })
                             .catch(error => console.error("Error fetching folder contents:", error));
                     }
