@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Porter's Five Forces Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #e5e7eb; /* gray-200 */
+            outline: none;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6b7280; /* gray-500 */
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6b7280; /* gray-500 */
+            cursor: pointer;
+        }
+
+        input[type="range"]:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.3); /* gray-500 with opacity */
+        }
+
+        input[type="range"]:focus::-moz-range-thumb {
+            box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.3); /* gray-500 with opacity */
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover,
+        input[type="range"]::-moz-range-thumb:hover {
+            background: #4b5563; /* gray-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container max-w-2xl mx-auto bg-white shadow-md rounded-lg p-8">
+        <h1 class="text-2xl font-semibold text-blue-600 text-center mb-6">Porter's Five Forces Simulator</h1>
+        <p class="text-gray-700 text-center mb-4">Evaluate the attractiveness of an industry by adjusting the strength of each of Porter's Five Forces.</p>
+
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Threat of New Entrants</h2>
+            <input type="range" id="newEntrants" min="0" max="10" value="5" class="w-full">
+            <p id="newEntrantsValue" class="text-sm text-gray-500 text-center mt-1"></p>
+            <ul id="newEntrantsFeatures" class="list-disc list-inside text-gray-600 mt-2">
+            </ul>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Bargaining Power of Suppliers</h2>
+            <input type="range" id="suppliers" min="0" max="10" value="5" class="w-full">
+            <p id="suppliersValue" class="text-sm text-gray-500 text-center mt-1"></p>
+            <ul id="suppliersFeatures" class="list-disc list-inside text-gray-600 mt-2">
+            </ul>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Bargaining Power of Buyers</h2>
+            <input type="range" id="buyers" min="0" max="10" value="5" class="w-full">
+            <p id="buyersValue" class="text-sm text-gray-500 text-center mt-1"></p>
+            <ul id="buyersFeatures" class="list-disc list-inside text-gray-600 mt-2">
+            </ul>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Threat of Substitute Products or Services</h2>
+            <input type="range" id="substitutes" min="0" max="10" value="5" class="w-full">
+            <p id="substitutesValue" class="text-sm text-gray-500 text-center mt-1"></p>
+            <ul id="substitutesFeatures" class="list-disc list-inside text-gray-600 mt-2">
+            </ul>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Competitive Rivalry Among Existing Firms</h2>
+            <input type="range" id="rivalry" min="0" max="10" value="5" class="w-full">
+            <p id="rivalryValue" class="text-sm text-gray-500 text-center mt-1"></p>
+            <ul id="rivalryFeatures" class="list-disc list-inside text-gray-600 mt-2">
+            </ul>
+        </div>
+
+        <div class="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Overall Industry Attractiveness:</h2>
+            <p id="overallResult" class="text-lg font-semibold text-center text-green-600">Neutral</p>
+        </div>
+
+        <div class="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h2="text-xl font-semibold text-gray-800 mb-4">Strategy Suggestions:</h2>
+            <ul id="strategySuggestions" class="list-disc list-inside text-gray-700">
+                <li>No specific suggestions available.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const newEntrantsSlider = document.getElementById("newEntrants");
+        const suppliersSlider = document.getElementById("suppliers");
+        const buyersSlider = document.getElementById("buyers");
+        const substitutesSlider = document.getElementById("substitutes");
+        const rivalrySlider = document.getElementById("rivalry");
+
+        const newEntrantsValueDisplay = document.getElementById("newEntrantsValue");
+        const suppliersValueDisplay = document.getElementById("suppliersValue");
+        const buyersValueDisplay = document.getElementById("buyersValue");
+        const substitutesValueDisplay = document.getElementById("substitutesValue");
+        const rivalryValueDisplay = document.getElementById("rivalryValue");
+
+        const newEntrantsFeaturesList = document.getElementById("newEntrantsFeatures");
+        const suppliersFeaturesList = document.getElementById("suppliersFeatures");
+        const buyersFeaturesList = document.getElementById("buyersFeatures");
+        const substitutesFeaturesList = document.getElementById("substitutesFeatures");
+        const rivalryFeaturesList = document.getElementById("rivalryFeatures");
+
+        const overallResultDisplay = document.getElementById("overallResult");
+        const strategySuggestionsList = document.getElementById("strategySuggestions");
+
+        function updateValueDisplay(slider, displayElement) {
+            const value = parseInt(slider.value);
+            let description = "";
+            let colorClass = "";
+            if (value <= 2) {
+                description = "Very Low";
+                colorClass = "text-green-500";
+            } else if (value <= 4) {
+                description = "Low";
+                colorClass = "text-green-400";
+            } else if (value <= 6) {
+                description = "Medium";
+                colorClass = "text-yellow-500";
+            } else if (value <= 8) {
+                description = "High";
+                colorClass = "text-orange-500";
+            } else {
+                description = "Very High";
+                colorClass = "text-red-500";
+            }
+            displayElement.textContent = description;
+            displayElement.className = `text-sm text-center ${colorClass}`;
+            slider.style.setProperty('--thumb-color', colorClass);
+        }
+
+        function updateFeatureList(slider, featureList) {
+            const value = parseInt(slider.value);
+            featureList.innerHTML = "";
+            const features = [];
+            if (slider.id === "newEntrants") {
+                if (value <= 2) {
+                    features.push("High capital requirements");
+                    features.push("Strict regulations");
+                    features.push("Strong brand loyalty");
+                } else if (value <= 4) {
+                    features.push("Moderate capital requirements");
+                    features.push("Some regulations");
+                    features.push("Established brand loyalty");
+                } else if (value <= 6) {
+                    features.push("Average capital requirements");
+                    features.push("Moderate regulations");
+                    features.push("Moderate brand loyalty");
+                } else if (value <= 8) {
+                    features.push("Low capital requirements");
+                    features.push("Few regulations");
+                    features.push("Weak brand loyalty");
+                } else {
+                    features.push("Very low capital requirements");
+                    features.push("Minimal regulations");
+                    features.push("No brand loyalty");
+                }
+            } else if (slider.id === "suppliers") {
+                if (value <= 2) {
+                    features.push("Many suppliers");
+                    features.push("Low switching costs");
+                    features.push("Standardized inputs");
+                } else if (value <= 4) {
+                    features.push("Several suppliers");
+                    features.push("Moderate switching costs");
+                    features.push("Somewhat standardized inputs");
+                } else if (value <= 6) {
+                    features.push("Limited suppliers");
+                    features.push("Moderate switching costs");
+                    features.push("Differentiated inputs");
+                } else if (value <= 8) {
+                    features.push("Few suppliers");
+                    features.push("High switching costs");
+                    features.push("Unique inputs");
+                } else {
+                    features.push("Very few suppliers");
+                    features.push("Very high switching costs");
+                    features.push("Proprietary inputs");
+                }
+            } else if (slider.id === "buyers") {
+                if (value <= 2) {
+                    features.push("Many buyers");
+                    features.push("Low volume purchases");
+                    features.push("Undifferentiated products");
+                } else if (value <= 4) {
+                    features.push("Several buyers");
+                    features.push("Moderate volume purchases");
+                    features.push("Somewhat differentiated products");
+                } else if (value <= 6) {
+                    features.push("Concentrated buyers");
+                    features.push("Large volume purchases");
+                    features.push("Differentiated products");
+                } else if (value <= 8) {
+                    features.push("Few buyers");
+                    features.push("Very large volume purchases");
+                    features.push("Specialized products");
+                } else {
+                    features.push("Very few buyers");
+                    features.push("Massive volume purchases");
+                    features.push("Highly specialized products");
+                }
+            } else if (slider.id === "substitutes") {
+                if (value <= 2) {
+                    features.push("Few substitutes");
+                    features.push("Low substitute quality");
+                    features.push("High switching costs to substitutes");
+                } else if (value <= 4) {
+                    features.push("Some substitutes");
+                    features.push("Moderate substitute quality");
+                    features.push("Moderate switching costs to substitutes");
+                } else if (value <= 6) {
+                    features.push("Many substitutes");
+                    features.push("Comparable substitute quality");
+                    features.push("Low switching costs to substitutes");
+                } else if (value <= 8) {
+                    features.push("Numerous substitutes");
+                    features.push("High substitute quality");
+                    features.push("Very low switching costs to substitutes");
+                } else {
+                    features.push("Readily available substitutes");
+                    features.push("Superior substitute quality");
+                    features.push("No switching costs to substitutes");
+                }
+            } else if (slider.id === "rivalry") {
+                if (value <= 2) {
+                    features.push("Few competitors");
+                    features.push("Slow market growth");
+                    features.push("High product differentiation");
+                } else if (value <= 4) {
+                    features.push("Some competitors");
+                    features.push("Moderate market growth");
+                    features.push("Moderate product differentiation");
+                } else if (value <= 6) {
+                    features.push("Many competitors");
+                    features.push("Growing market");
+                    features.push("Some product differentiation");
+                } else if (value <= 8) {
+                    features.push("Numerous competitors");
+                    features.push("Fast market growth");
+                    features.push("Low product differentiation");
+                } else {
+                    features.push("Very many competitors");
+                    features.push("Stagnant/declining market");
+                    features.push("Commoditized products");
+                }
+            }
+
+            features.forEach(feature => {
+                const li = document.createElement("li");
+                li.textContent = feature;
+                featureList.appendChild(li);
+            });
+        }
+
+        function calculateOverall() {
+            const newEntrants = parseInt(newEntrantsSlider.value);
+            const suppliers = parseInt(suppliersSlider.value);
+            const buyers = parseInt(buyersSlider.value);
+            const substitutes = parseInt(substitutesSlider.value);
+            const rivalry = parseInt(rivalrySlider.value);
+
+            const average = (newEntrants + suppliers + buyers + substitutes + rivalry) / 5;
+
+            let resultText = "";
+            let resultColor = "";
+            if (average <= 3) {
+                resultText = "Highly Attractive";
+                resultColor = "text-green-600";
+            } else if (average <= 5) {
+                resultText = "Moderately Attractive";
+                resultColor = "text-green-500";
+            } else if (average <= 7) {
+                resultText = "Neutral";
+                resultColor = "text-yellow-500";
+            } else if (average <= 8) {
+                resultText = "Moderately Unattractive";
+                resultColor = "text-orange-500";
+            } else {
+                resultText = "Highly Unattractive";
+                resultColor = "text-red-600";
+            }
+
+            overallResultDisplay.textContent = resultText;
+            overallResultDisplay.className = `text-lg font-semibold text-center ${resultColor}`;
+
+            updateStrategySuggestions(newEntrants, suppliers, buyers, substitutes, rivalry);
+        }
+
+        function updateStrategySuggestions(newEntrants, suppliers, buyers, substitutes, rivalry) {
+            strategySuggestionsList.innerHTML = ""; // Clear previous suggestions
+            const suggestions = [];
+
+            if (newEntrants >= 7) {
+                suggestions.push("Build strong barriers to entry such as economies of scale, brand loyalty, or proprietary technology. (Reduces Threat of New Entrants)");
+            }
+            if (suppliers >= 7) {
+                suggestions.push("Diversify your supplier base or integrate vertically to reduce supplier power. (Reduces Bargaining Power of Suppliers)");
+            }
+            if (buyers >= 7) {
+                suggestions.push("Differentiate your products or services to reduce buyer power. (Reduces Bargaining Power of Buyers)");
+            }
+            if (substitutes >= 7) {
+                suggestions.push("Enhance the value of your offerings and create strong brand loyalty to combat substitutes. (Reduces Threat of Substitute Products or Services)");
+            }
+            if (rivalry >= 7) {
+                suggestions.push("Seek to differentiate your company. Consider strategies like product differentiation, forming strategic alliances, or pursuing cost leadership. (Reduces Competitive Rivalry Among Existing Firms)");
+            }
+
+            if (suggestions.length === 0) {
+                suggestions.push("No specific suggestions available.");
+            }
+
+            suggestions.forEach(suggestion => {
+                const li = document.createElement("li");
+                li.textContent = suggestion;
+                strategySuggestionsList.appendChild(li);
+            });
+        }
+
+
+        newEntrantsSlider.addEventListener("input", () => {
+            updateValueDisplay(newEntrantsSlider, newEntrantsValueDisplay);
+            updateFeatureList(newEntrantsSlider, newEntrantsFeaturesList);
+            calculateOverall();
+        });
+        suppliersSlider.addEventListener("input", () => {
+            updateValueDisplay(suppliersSlider, suppliersValueDisplay);
+            updateFeatureList(suppliersSlider, suppliersFeaturesList);
+            calculateOverall();
+        });
+        buyersSlider.addEventListener("input", () => {
+            updateValueDisplay(buyersSlider, buyersValueDisplay);
+            updateFeatureList(buyersSlider, buyersFeaturesList);
+            calculateOverall();
+        });
+        substitutesSlider.addEventListener("input", () => {
+            updateValueDisplay(substitutesSlider, substitutesValueDisplay);
+            updateFeatureList(substitutesSlider, substitutesFeaturesList);
+            calculateOverall();
+        });
+        rivalrySlider.addEventListener("input", () => {
+            updateValueDisplay(rivalrySlider, rivalryValueDisplay);
+            updateFeatureList(rivalrySlider, rivalryFeaturesList);
+            calculateOverall();
+        });
+
+        // Initial update of the display
+        updateValueDisplay(newEntrantsSlider, newEntrantsValueDisplay);
+        updateFeatureList(newEntrantsSlider, newEntrantsFeaturesList);
+        updateValueDisplay(suppliersSlider, suppliersValueDisplay);
+        updateFeatureList(suppliersSlider, suppliersFeaturesList);
+        updateValueDisplay(buyersSlider, buyersValueDisplay);
+        updateFeatureList(buyersSlider, buyersFeaturesList);
+        updateValueDisplay(substitutesSlider, substitutesValueDisplay);
+        updateFeatureList(substitutesSlider, substitutesFeaturesList);
+        updateValueDisplay(rivalrySlider, rivalryValueDisplay);
+        updateFeatureList(rivalrySlider, rivalryFeaturesList);
+        calculateOverall();
+    </script>
+</body>
+</html>
