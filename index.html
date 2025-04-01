@@ -9,11 +9,12 @@
         ul { list-style: none; padding: 0; }
         li { margin: 10px 0; }
         a { text-decoration: none; color: blue; font-size: 18px; }
+        .folder { font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <h1>Folders in Repository</h1>
-    <ul id="folderList"></ul>
+    <h1>Folders and Files in Repository</h1>
+    <ul id="repoContents"></ul>
 
     <script>
         const repoOwner = "tnqatest"; // Change this
@@ -22,15 +23,31 @@
         fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents`)
             .then(response => response.json())
             .then(data => {
-                const folderList = document.getElementById("folderList");
+                const repoContents = document.getElementById("repoContents");
                 data.forEach(item => {
                     if (item.type === "dir") {
-                        const li = document.createElement("li");
-                        const a = document.createElement("a");
-                        a.href = `./${item.name}/`; 
-                        a.textContent = item.name;
-                        li.appendChild(a);
-                        folderList.appendChild(li);
+                        const folderItem = document.createElement("li");
+                        folderItem.textContent = item.name;
+                        folderItem.classList.add("folder");
+                        repoContents.appendChild(folderItem);
+
+                        fetch(item.url)
+                            .then(response => response.json())
+                            .then(files => {
+                                const fileList = document.createElement("ul");
+                                files.forEach(file => {
+                                    if (file.type === "file") {
+                                        const fileItem = document.createElement("li");
+                                        const a = document.createElement("a");
+                                        a.href = file.download_url;
+                                        a.textContent = file.name;
+                                        fileItem.appendChild(a);
+                                        fileList.appendChild(fileItem);
+                                    }
+                                });
+                                repoContents.appendChild(fileList);
+                            })
+                            .catch(error => console.error("Error fetching folder contents:", error));
                     }
                 });
             })
