@@ -19,6 +19,7 @@
     <script>
         const repoOwner = "tnqatest"; // Change this
         const repoName = "CanvashtmlpagesTEST"; // Change this
+        const repoPagesURL = `https://${repoOwner}.github.io/${repoName}/`;
         
         fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents`)
             .then(response => response.json())
@@ -39,7 +40,7 @@
                                     if (file.type === "file") {
                                         const fileItem = document.createElement("li");
                                         const a = document.createElement("a");
-                                        a.href = file.download_url;
+                                        a.href = `${repoPagesURL}${item.name}/${file.name}`;
                                         a.textContent = file.name;
                                         fileItem.appendChild(a);
                                         fileList.appendChild(fileItem);
