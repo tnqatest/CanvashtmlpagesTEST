@@ -5,26 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Repository Folders</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        ul { list-style: none; padding: 0; }
-        li { margin: 10px 0; cursor: pointer; }
-        a { text-decoration: none; color: blue; font-size: 18px; }
-        .folder { font-weight: bold; display: flex; align-items: center; }
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        ul { 
+            list-style: none; 
+            padding: 0; 
+            text-align: left;
+        }
+        li {
+            margin: 8px 0;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        li:hover {
+            background: #e0e0e0;
+        }
+        a {
+            text-decoration: none; 
+            color: #007bff; 
+            font-size: 16px; 
+            display: block;
+            padding: 5px 10px;
+        }
+        .folder {
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            background: #d1ecf1;
+            padding: 10px;
+            border-radius: 5px;
+        }
         .folder::before { 
             content: '\25B6'; /* Right arrow */
             display: inline-block; 
-            margin-right: 5px; 
+            margin-right: 10px; 
             transition: transform 0.2s;
         }
         .folder.open::before {
             transform: rotate(90deg); /* Down arrow when open */
         }
-        .file-list { display: none; padding-left: 20px; }
+        .file-list { 
+            display: none; 
+            padding-left: 20px; 
+            margin-top: 5px;
+            background: #eef7ff;
+            border-radius: 5px;
+            padding: 10px;
+            border-left: 3px solid #007bff;
+        }
     </style>
 </head>
 <body>
-    <h1>Folders and Files in Repository</h1>
-    <ul id="repoContents"></ul>
+    <div class="container">
+        <h1>Folders and Files in Repository</h1>
+        <ul id="repoContents"></ul>
+    </div>
 
     <script>
         const repoOwner = "tnqatest"; // Change this
@@ -40,11 +92,12 @@
                         const folderItem = document.createElement("li");
                         folderItem.textContent = item.name;
                         folderItem.classList.add("folder");
+                        repoContents.appendChild(folderItem);
+                        
                         const fileList = document.createElement("ul");
                         fileList.classList.add("file-list");
-                        folderItem.appendChild(fileList);
-                        repoContents.appendChild(folderItem);
-
+                        folderItem.insertAdjacentElement("afterend", fileList);
+                        
                         folderItem.addEventListener("click", () => {
                             fileList.style.display = fileList.style.display === "none" ? "block" : "none";
                             folderItem.classList.toggle("open");
